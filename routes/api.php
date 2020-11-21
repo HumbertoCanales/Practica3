@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ApiFunctions;
 
 //Auth
-Route::post('/signup','ApiAuth\AuthController@signUp');
+Route::post('/signup','ApiAuth\AuthController@signUp')->middleware('check.age');
 Route::post('/login','ApiAuth\AuthController@logIn');
 Route::delete('/logout','ApiAuth\AuthController@logOut')->middleware('auth:sanctum');
 Route::post('/email/resend','ApiAuth\VerificationController@resend')->name('verificationapi.resend');
@@ -19,7 +19,7 @@ Route::middleware('tokenCan:admin:admin')->group(function(){
     Route::post('users/{user}/abilities','ApiFunctions\AbilityController@grantAbi');
     Route::delete('users/{user}/abilities','ApiFunctions\AbilityController@revokeAbi');
     
-    Route::put('/users/{user}','UserController@update');
+    Route::post('/users/{user}','UserController@update');
     Route::delete('/users/{user}','UserController@destroy');
     
     Route::get('/posts/comments','CommentController@allPC');

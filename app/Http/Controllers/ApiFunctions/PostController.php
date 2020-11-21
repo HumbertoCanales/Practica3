@@ -54,16 +54,22 @@ class PostController extends Controller
                 return response()->json(['error' => "The post you wanted to update doesn't exists."], 400);
             }
             $request->validate([
-                'title' => 'required|min:1|max:50',
-                'content' => 'required|min:1|max:255',
-                'image' => 'required|mimes:jpeg,png,svg']);
-            Storage::delete($post->image);
-            $path = Storage::putFile('img/posts', new File($request->image));
+                'title' => 'min:1|max:50',
+                'content' => 'min:1|max:255',
+                'image' => 'mimes:jpeg,png,svg']);
+            if($request->has('image')){
+                Storage::delete($post->image);
+                $image = Storage::putFile('img/posts', new File($request->image));
+            }else{
+                $image = $post->image;
+            }
+            $title = $request->filled('title')? $request->title : $post->title;
+            $content = $request->filled('content')? $request->content : $post->content;
             $post->update([
                     'user_id' => $request->user()->id,
-                    'title' => $request->title,
-                    'content' => $request->content,
-                    'image' => $path]);
+                    'title' => $title,
+                    'content' => $content,
+                    'image' => $image]);
             $post = Post::find($id);
             return response()->json($post, 201);
             }else{

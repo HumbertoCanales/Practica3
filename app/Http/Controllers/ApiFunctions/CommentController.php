@@ -26,7 +26,7 @@ class CommentController extends Controller
     {
         $posts = Post::all();
         foreach ($posts as $post) {
-            $post(['comments' => $post->comments]);
+            $post['comments'] = $post->comments;
             $PC[] = $post;
         }
         return response()->json($PC, 200);

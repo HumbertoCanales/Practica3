@@ -121,12 +121,12 @@ class UserController extends Controller
         $name = $request->filled('name')? $request->name : $user->name;
         $age = $request->filled('age')? $request->age : $user->age;
         $password = $request->filled('password')? $request->password : $user->password;
-
         $user->update([
-            'email' => $request->email,
-            'name' => $request->name,
-            'age' => $request->age,
-            'password' => Hash::make($request->password)]);
+            'email' => $email,
+            'name' => $name,
+            'age' => $age,
+            'password' => Hash::make($password),
+            'image' => $image]);
         $user = User::find($id);
         if($request->filled('email')){
             if($request->email != $user->email){
