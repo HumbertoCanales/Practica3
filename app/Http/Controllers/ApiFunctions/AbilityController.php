@@ -15,94 +15,59 @@ class AbilityController extends Controller
 
     public function abi(Request $request)
     {
-        if($request->user()->tokenCan('admin:admin')){
-            $abilities = Ability::all();
-            return response()->json($abilities, 200);
-        }else{
-            return response()->json(['message' => "Unauthorized",
-                                      'code' => 401], 401);
-        }
+        $abilities = Ability::all();
+        return response()->json($abilities, 200);
     }
 
     public function showAbi(Request $request, int $user)
     {
-        if($request->user()->tokenCan('admin:admin')){
-            $user_sel = User::find($user);
-            if($user_sel){
-                $abilities = $user_sel->abilities;
-                return response()->json($abilities, 200);
-            }else{
-                return response()->json(['message' => "The user you are looking for doesn't exists.",
+        $user_sel = User::find($user);
+        if(!$user_sel){
+            return response()->json(['message' => "The user you are looking for doesn't exists.",
                                       'code' => 404], 404);
-            }
-        }else{
-            return response()->json(['message' => "Unauthorized",
-                                      'code' => 401], 401);
         }
+        $abilities = $user_sel->abilities;
+        return response()->json($abilities, 200);
     }
 
     public function grantAbi(Request $request, int $user){
-        if($request->user()->tokenCan('admin:admin')){
-            $user_sel = User::find($user);
-        if($user_sel){
-            $request -> validate([
-                'ability_name' => 'required'
-            ]);
-            $ability = $request->ability_name;
-            if(!Ability::where('name', $ability)->first()){
-                return response()->json(['message' => "This ability doesn't exists.",
-                                        'code' => 200],200);
-            }
-            if($user_sel){
-                $rep_ability = $user_sel->abilities->where('name', $ability)->first();
-                if(!$rep_ability){
-                    $user_sel->abilities()->attach(Ability::where('name', $ability)->first());
-                    return response()->json(['message' => $ability." ability granted to the user ".$user,
-                                        'code' => 200],200);
-                }
-                return response()->json(['message' => "This ability has already been granted to this user.",
-                                        'code' => 200],200);
-            }
-        }else{
-            return response()->json(['message' => "The user you are looking for doesn't exists.",
-                                      'code' => 404], 404);
+        $user_sel = User::find($user);
+        if(!$user_sel){
+            return response()->json(['message' => "The user you are looking for doesn't exists."], 404);
         }
-        }else{
-            return response()->json(['message' => "Unauthorized",
-                                      'code' => 401], 401);
+        $request -> validate([
+            'ability_name' => 'required'
+        ]);
+        $ability = $request->ability_name;
+        if(!Ability::where('name', $ability)->first()){
+            return response()->json(['message' => "This ability doesn't exists."],200);
         }
+        $rep_ability = $user_sel->abilities->where('name', $ability)->first();
+        if($rep_ability){
+            return response()->json(['message' => "This ability has already been granted to this user."], 200);
+        }
+        $user_sel->abilities()->attach(Ability::where('name', $ability)->first());
+        return response()->json(['message' => $ability." ability granted to the user ".$user],200);
     }
 
     public function revokeAbi(Request $request, $user){
-        if($request->user()->tokenCan('admin:admin')){
-            $selected_user = User::find($user);
-        if($selected_user){
-            $request -> validate([
-                'ability_name' => 'required'
-            ]);
-            $ability = $request->ability_name;
-            if(!Ability::where('name', $ability)->first()){
-                return response()->json(['message' => "This ability doesn't exists.",
-                                        'code' => 200],200);
-            }
-            if($selected_user){
-                $ability_exs = $selected_user->abilities->where('name', $ability)->first();
-                if($ability_exs){
-                    $selected_user->abilities()->detach(Ability::where('name', $ability)->first());
-                    return response()->json(['message' => $ability." ability revoked for the user ".$user,
-                                        'code' => 200],200);
-                }
-                return response()->json(['message' => "This ability hasn't been granted to this user.",
-                                        'code' => 200],200);
-            }
-        }else{
-            return response()->json(['message' => "The user you are looking for doesn't exists.",
-                                      'code' => 404], 404);
+        $selected_user = User::find($user);
+        if(!$selected_user){
+            return response()->json(['message' => "The user you are looking for doesn't exists."],404);
         }
-        }else{
-            return response()->json(['message' => "Unauthorized",
-                                      'code' => 401], 401);
+        $request -> validate([
+            'ability_name' => 'required'
+        ]);
+        $ability = $request->ability_name;
+        if(!Ability::where('name', $ability)->first()){
+            return response()->json(['message' => "This ability doesn't exists."], 200);
         }
+        $ability_exs = $selected_user->abilities->where('name', $ability)->first();
+        if(!$ability_exs){
+            return response()->json(['message' => "This ability hasn't been granted to this user."], 200);
+        }
+        $selected_user->abilities()->detach(Ability::where('name', $ability)->first());
+        return response()->json(['message' => $ability." ability revoked for the user ".$user],200);
     }
 }
 

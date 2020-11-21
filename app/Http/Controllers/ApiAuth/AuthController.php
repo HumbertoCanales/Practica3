@@ -22,13 +22,13 @@ class AuthController extends Controller
             'email' => $request->email,
             'name' => $request->name,
             'age' => $request->age,
-            'image' => 'prueba',
             'password' => Hash::make($request->password)]);
         if($user){
             $user->sendApiEmailVerificationNotification();
             $user->abilities()->attach(Ability::where('name','user:profile')->first());
             $user->abilities()->attach(Ability::where('name','post:publish')->first());
             $user->abilities()->attach(Ability::where('name','com:publish')->first());
+            $user->abilities()->attach(Ability::where('name','nyt:data')->first());
             return response()->json($user, 201);
         }
         return abort(400, "Something went wrong...");

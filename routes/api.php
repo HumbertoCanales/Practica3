@@ -46,8 +46,10 @@ Route::middleware('tokenCan:user:info')->group(function(){
 });
 
 //   can -> user:profile
-Route::get('/profile','UserController@showMP')->middleware('tokenCan:user:profile');
-Route::post('/profile','UserController@updateMP')->middleware('tokenCan:user:profile');
+Route::middleware('tokenCan:user:profile')->group(function(){
+    Route::get('/profile','UserController@showMP');
+    Route::post('/profile','UserController@updateMP');
+});
 
 //   can -> post:publish
 Route::post('/posts','PostController@store')->middleware('tokenCan:post:publish');

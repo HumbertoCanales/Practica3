@@ -15,7 +15,8 @@ class AbilitySeeder extends Seeder
             ['name' => 'post:delete'],
             ['name' => 'com:publish'],
             ['name' => 'com:edit'],
-            ['name' => 'com:delete']
+            ['name' => 'com:delete'],
+            ['name' => 'nyt:data']
         ]);
     }
 }
